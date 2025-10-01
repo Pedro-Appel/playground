@@ -1,11 +1,11 @@
-package sorting.experiments;
+package com.appel.experiments.sorting;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.Executors;
 
 
-public class ThreadSort {
+public class ParallelBubbleSort {
 
     List<Integer> arraySizes = List.of(10,20,50,100,200,500,1000,3000,5000,10000,50000);
     List<Analysis> analysisList = new ArrayList<>();
@@ -33,18 +33,18 @@ public class ThreadSort {
     int[] sortable;
     final Object sortableLock = new Object();
 
-    int sort(int[] sortable) {
+    public int sort(int[] sortable) {
         this.sortable = sortable;
-        int loops = 0;
+//        int loops = 0;
         while (!sorted()) {
             try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
                 for (int i = 0; i < sortable.length; i++) {
                     executor.submit(new ArraySorter(i, this));
                 }
             }
-            loops++;
+//            loops++;
         }
-        return loops;
+        return 0;
     }
 
     private boolean sorted() {
@@ -68,18 +68,18 @@ public class ThreadSort {
 
     private class ArraySorter implements Runnable {
         private int i;
-        private final ThreadSort threadSort;
+        private final ParallelBubbleSort parallelBubbleSort;
 
-        public ArraySorter(int i, ThreadSort threadSort) {
+        public ArraySorter(int i, ParallelBubbleSort parallelBubbleSort) {
             this.i = i;
-            this.threadSort = threadSort;
+            this.parallelBubbleSort = parallelBubbleSort;
         }
 
         @Override
         public void run() {
             if (sortable[i] > sortable[i + 1]) {
                 try {
-                    threadSort.updateIndexes(i);
+                    parallelBubbleSort.updateIndexes(i);
                 } catch (Exception e) {
                     throw new  RuntimeException(e);
                 }
